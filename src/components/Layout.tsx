@@ -18,6 +18,7 @@ export default function Layout({ children, onAddClick, activeTab, onTabChange, o
   const { user, profile, loading } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   React.useEffect(() => {
     const handleResize = () => setIsSidebarOpen(window.innerWidth > 768);
@@ -107,18 +108,23 @@ export default function Layout({ children, onAddClick, activeTab, onTabChange, o
                 <p className="text-xs font-bold text-white leading-none mb-1">{user.displayName}</p>
                 <p className="text-[10px] text-slate-500 leading-none">Pro Member</p>
               </div>
-              <div className="relative group">
-                <img src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}`} alt="Profile" className="w-8 h-8 rounded-full border border-white/10 ring-2 ring-blue-500/20" />
-                <div className="absolute top-full right-0 mt-2 w-48 glass-dark border border-white/10 rounded-xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 shadow-2xl">
-                  <div className="p-3 border-b border-white/5"><p className="text-xs font-bold text-white truncate">{user.displayName}</p><p className="text-[10px] text-slate-500 truncate">{user.email}</p></div>
-                  <button onClick={logout} className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-400 hover:bg-white/5 transition-colors"><LogOut className="w-3 h-3" /> Sign Out</button>
-                </div>
-              </div>
+              <button
+                onClick={() => setIsProfileModalOpen(true)}
+                className="relative group transition-transform active:scale-90"
+                id="open-profile-btn"
+              >
+                <img src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}`} alt="Profile" className="w-8 h-8 rounded-full border border-white/10 ring-2 ring-blue-500/20 group-hover:ring-blue-500/50 transition-all" />
+              </button>
             </div>
           )}
         </header>
         <div className="flex-1 p-4 md:p-8 overflow-y-auto w-full max-w-full">{children}</div>
       </main>
+
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+      />
     </div>
   );
-}
+              }
