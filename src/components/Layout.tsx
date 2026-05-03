@@ -1,3 +1,4 @@
+import { ProfileModal } from './ProfileModal';
 import React, { useState } from 'react';
 import { LayoutDashboard, Search, Menu, Archive, Zap, FolderLock, StickyNote, Plus, Grid, Star, LogOut } from 'lucide-react';
 import { useAuth } from '../lib/auth';
