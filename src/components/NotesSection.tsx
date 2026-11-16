@@ -1,26 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Trash2, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Note } from '../types';
-import { useAuth } from '../lib/auth';
-import { db, handleFirestoreError, OperationType } from '../lib/firebase';
-import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp, orderBy } from 'firebase/firestore';
+import { newId, put, remove, useLiveList } from '../lib/db';
 
 export default function NotesSection() {
-  const { user } = useAuth();
-  const [notes, setNotes] = useState<Note[]>([]);
+  const { items: notes } = useLiveList<Note>('notes');
   const [newNote, setNewNote] = useState('');
-
-  useEffect(() => {
-    if (!user) return;
-    const q = query(collection(db, 'notes'), where('userId', '==', user.uid), orderBy('createdAt', 'desc'));
-    return onSnapshot(q, (s) => setNotes(s.docs.map(d => ({ id: d.id, ...d.data() })) as Note[]), (e) => handleFirestoreError(e, OperationType.LIST, 'notes'));
-  }, [user]);
 
   const handleAddNote = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newNote.trim() || !user) return;
-    await addDoc(collection(db, 'notes'), { userId: user.uid, content: newNote, title: 'Quick Note', createdAt: serverTimestamp() });
+    if (!newNote.trim()) return;
+    await put<Note>('notes', { id: newId(), content: newNote, title: 'Quick Note', createdAt: Date.now() });
     setNewNote('');
   };
 
@@ -41,7 +32,7 @@ export default function NotesSection() {
         <AnimatePresence>
           {notes.map(note => (
             <motion.div key={note.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }} className="glass p-5 rounded-2xl border border-white/5 relative group">
-              <button onClick={() => deleteDoc(doc(db, 'notes', note.id))} className="absolute top-4 right-4 p-1.5 opacity-0 group-hover:opacity-100 hover:bg-red-500/10 rounded-lg transition-all">
+              <button onClick={() => remove('notes', note.id)} className="absolute top-4 right-4 p-1.5 opacity-0 group-hover:opacity-100 hover:bg-red-500/10 rounded-lg transition-all">
                 <Trash2 className="w-4 h-4 text-red-400" />
               </button>
               <p className="text-slate-300 text-sm whitespace-pre-wrap pr-8">{note.content}</p>

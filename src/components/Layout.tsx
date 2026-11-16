@@ -1,8 +1,5 @@
-import { ProfileModal } from './ProfileModal';
 import React, { useState } from 'react';
-import { LayoutDashboard, Search, Menu, Archive, Zap, FolderLock, StickyNote, Plus, Grid, Star, LogOut } from 'lucide-react';
-import { useAuth } from '../lib/auth';
-import { signInWithGoogle, logout } from '../lib/firebase';
+import { LayoutDashboard, Search, Menu, Archive, Zap, FolderLock, StickyNote, Plus, Grid, Star, Images, HardDrive } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface LayoutProps {
@@ -15,10 +12,8 @@ interface LayoutProps {
 }
 
 export default function Layout({ children, onAddClick, activeTab, onTabChange, onSearchChange }: LayoutProps) {
-  const { user, profile, loading } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   React.useEffect(() => {
     const handleResize = () => setIsSidebarOpen(window.innerWidth > 768);
@@ -35,16 +30,11 @@ export default function Layout({ children, onAddClick, activeTab, onTabChange, o
     { icon: LayoutDashboard, label: 'Dashboard', id: 'dashboard' },
     { icon: Grid, label: 'All Apps', id: 'apps' },
     { icon: Star, label: 'Favorites', id: 'favorites' },
+    { icon: Images, label: 'Photos & Videos', id: 'media' },
     { icon: Archive, label: 'Archive', id: 'archive' },
     { icon: FolderLock, label: 'Vault', id: 'vault' },
     { icon: StickyNote, label: 'Notes', id: 'notes' },
   ];
-
-  if (loading) return (
-    <div className="h-screen w-screen flex items-center justify-center bg-slate-950">
-      <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }} className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full" />
-    </div>
-  );
 
   return (
     <div className="min-h-screen md:flex text-slate-200 overflow-x-hidden">
@@ -75,20 +65,10 @@ export default function Layout({ children, onAddClick, activeTab, onTabChange, o
             ))}
           </div>
           <div className="p-4 border-t border-white/5">
-            {user ? (
-              <div className="flex items-center gap-3 px-2 py-3">
-                <img src={profile?.photoURL} alt="" className="w-10 h-10 rounded-full border-2 border-white/10" />
-                <div className="flex-1 overflow-hidden">
-                  <p className="text-sm font-semibold text-white truncate">{profile?.displayName}</p>
-                  <p className="text-xs text-slate-500 truncate">{profile?.email}</p>
-                </div>
-                <button onClick={logout} className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg"><LogOut className="w-5 h-5" /></button>
-              </div>
-            ) : (
-              <button onClick={signInWithGoogle} className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl border border-white/10">
-                <img src="https://www.google.com/favicon.ico" className="w-4 h-4" alt="" />Sign In
-              </button>
-            )}
+            <div className="flex items-center gap-3 px-2 py-2 text-slate-500">
+              <HardDrive className="w-5 h-5 flex-shrink-0" />
+              <p className="text-xs leading-snug">Saved privately on this device. No login needed.</p>
+            </div>
           </div>
         </div>
       </motion.aside>
@@ -102,29 +82,9 @@ export default function Layout({ children, onAddClick, activeTab, onTabChange, o
               <input type="text" placeholder="Search apps..." value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); onSearchChange(e.target.value); }} className="w-full bg-white/5 border border-white/5 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all placeholder:text-slate-600" />
             </div>
           </div>
-          {user && (
-            <div className="flex items-center gap-3 ml-4 pl-4 border-l border-white/10">
-              <div className="hidden md:block text-right">
-                <p className="text-xs font-bold text-white leading-none mb-1">{user.displayName}</p>
-                <p className="text-[10px] text-slate-500 leading-none">Pro Member</p>
-              </div>
-              <button
-                onClick={() => setIsProfileModalOpen(true)}
-                className="relative group transition-transform active:scale-90"
-                id="open-profile-btn"
-              >
-                <img src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}`} alt="Profile" className="w-8 h-8 rounded-full border border-white/10 ring-2 ring-blue-500/20 group-hover:ring-blue-500/50 transition-all" />
-              </button>
-            </div>
-          )}
         </header>
         <div className="flex-1 p-4 md:p-8 overflow-y-auto w-full max-w-full">{children}</div>
       </main>
-
-      <ProfileModal
-        isOpen={isProfileModalOpen}
-        onClose={() => setIsProfileModalOpen(false)}
-      />
     </div>
   );
-              }
+}
