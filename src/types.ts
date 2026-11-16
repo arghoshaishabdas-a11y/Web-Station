@@ -1,33 +1,10 @@
-export interface WebApp {
-  id: string;
-  userId: string;
-  name: string;
-  url: string;
-  icon?: string;
-  description?: string;
-  category: string;
-  tags: string[];
-  isFavorite: boolean;
-  isLocked: boolean;
-  isArchived?: boolean;
-  usageCount?: number;
-  cardColor?: string;
-  lastOpened?: any;
-  createdAt: any;
-}
-
-export interface Note {
-  id: string;
-  userId: string;
-  content: string;
-  title: string;
-  createdAt: any;
-}
-
 export interface UserProfile {
-  uid: string;
+  userId: string;
   email: string;
-  displayName: string;
+  nickname: string;
   photoURL: string;
+  streak: number;
+  lastWroteAt: string | null;
+  settings: { notificationTime: string; darkMode: boolean };
   createdAt: string;
 }
